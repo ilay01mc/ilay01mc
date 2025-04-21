@@ -98,38 +98,10 @@ async function fetchStatus() {
     playersText.textContent = `${data.players.online}/${data.players.max} players`;
     offlineDisclaimer.classList.add("hidden");
 
-    // Clear old list
-    const oldList = document.getElementById("player-list");
-    if (oldList) oldList.remove();
+    // Remove existing player list element if any
+const oldList = document.getElementById("player-list");
+if (oldList) oldList.remove();
 
-    const playerListContainer = document.createElement("div");
-    playerListContainer.id = "player-list";
-
-    const playerList = data.players?.list;
-
-    if (Array.isArray(playerList) && playerList.length > 0) {
-      playerList.forEach((player) => {
-        const playerEl = document.createElement("div");
-        playerEl.className = "player";
-
-        const avatar = document.createElement("img");
-        avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
-        avatar.alt = player.name;
-
-        const name = document.createElement("span");
-        name.textContent = player.name;
-
-        playerEl.appendChild(avatar);
-        playerEl.appendChild(name);
-        playerListContainer.appendChild(playerEl);
-      });
-    } else {
-      const empty = document.createElement("p");
-      empty.textContent = "No players online.";
-      playerListContainer.appendChild(empty);
-    }
-
-    playersText.insertAdjacentElement("afterend", playerListContainer);
   } catch (err) {
     statusText.textContent = "Server Offline";
     statusText.className = "status-offline";

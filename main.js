@@ -14,8 +14,8 @@ const PASSWORD = "123";
 const PASSWORD_KEY = "ip_access_pass";
 const PASSWORD_VERSION = "v1";
 
-const SERVER_IP = "ilaymc.ddns.net";
-const SERVER_PORT = "19132";
+// Your local API endpoint:
+const API_URL = "http://ilaymc.ddns.net:8080/status.json";
 
 const DEBUG_MODE = false;
 
@@ -67,30 +67,25 @@ function updateDebugInfo(message) {
 }
 
 async function fetchStatus() {
-  const url = `https://api.mcstatus.io/v2/status/bedrock/${SERVER_IP}:${SERVER_PORT}`;
-
   debugInfo.innerHTML = "";
-  updateDebugInfo("Checking server status...");
+  updateDebugInfo("Fetching from custom API...");
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(API_URL);
     const data = await response.json();
 
-    // Always show "Online" to avoid false negatives
+    // Always show online
     statusText.textContent = "Online";
     statusText.className = "status-online";
 
-    // Remove old disclaimer
-    offlineDisclaimer.classList.add("hidden");
-
     if (data && data.players && typeof data.players.online === "number") {
       playersText.textContent = `${data.players.online}/${data.players.max} players`;
+      offlineDisclaimer.classList.add("hidden");
     } else {
       playersText.textContent = "";
       offlineDisclaimer.classList.remove("hidden");
     }
   } catch (err) {
-    // On error, still show as online but say player count unavailable
     statusText.textContent = "Online";
     statusText.className = "status-online";
     playersText.textContent = "";

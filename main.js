@@ -1,4 +1,3 @@
-// main.js
 const statusTab = document.getElementById("status-tab");
 const ipTab = document.getElementById("ip-tab");
 const statusContainer = document.getElementById("status-container");
@@ -68,102 +67,79 @@ function updateDebugInfo(message) {
 }
 
 async function fetchStatus() {
-  const apiUrls = [
-    `https://api.mcstatus.io/v2/status/bedrock/${SERVER_IP}:${SERVER_PORT}`,
-    `https://api.mcstatus.io/v2/status/bedrock/${SERVER_IP}:${SERVER_PORT}`
-  ];
-
-  let successfulUrl = null;
-  let responseData = null;
+  const url = `https://api.mcstatus.io/v2/status/bedrock/${SERVER_IP}:${SERVER_PORT}`;
 
   debugInfo.innerHTML = "";
-  updateDebugInfo("Starting status check...");
+  updateDebugInfo("Checking server status...");
 
-  for (const url of apiUrls) {
-    try {
-      updateDebugInfo(`Trying URL: ${url}`);
-      const response = await fetch(url);
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-      if (!response.ok) {
-        updateDebugInfo(`Failed with status: ${response.status}`);
-        continue;
-      }
+    if (!data || typeof data.online !== "boolean") throw new Error("Invalid API response");
 
-      const data = await response.json();
-      updateDebugInfo(`Response received: ${JSON.stringify(data).substring(0, 100)}...`);
+    const online = data.online;
 
-      if (data && typeof data.online === 'boolean') {
-        successfulUrl = url;
-        responseData = data;
-        updateDebugInfo(`Success with URL: ${url}`);
-        break;
-      }
-    } catch (err) {
-      updateDebugInfo(`Error with URL ${url}: ${err.message}`);
+    if (!online) {
+      statusText.textContent = "Server Offline";
+      statusText.className = "status-offline";
+      playersText.textContent = "";
+      offlineDisclaimer.classList.remove("hidden");
+
+      const oldList = document.getElementById("player-list");
+      if (oldList) oldList.remove();
+
+      return;
     }
-  }
 
-  if (!responseData) {
-    updateDebugInfo("All URL formats failed");
+    // Online
+    statusText.textContent = "Online";
+    statusText.className = "status-online";
+    playersText.textContent = `${data.players.online}/${data.players.max} players`;
+    offlineDisclaimer.classList.add("hidden");
+
+    // Clear old list
+    const oldList = document.getElementById("player-list");
+    if (oldList) oldList.remove();
+
+    const playerListContainer = document.createElement("div");
+    playerListContainer.id = "player-list";
+
+    const playerList = data.players?.list;
+
+    if (Array.isArray(playerList) && playerList.length > 0) {
+      playerList.forEach((player) => {
+        const playerEl = document.createElement("div");
+        playerEl.className = "player";
+
+        const avatar = document.createElement("img");
+        avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
+        avatar.alt = player.name;
+
+        const name = document.createElement("span");
+        name.textContent = player.name;
+
+        playerEl.appendChild(avatar);
+        playerEl.appendChild(name);
+        playerListContainer.appendChild(playerEl);
+      });
+    } else {
+      const empty = document.createElement("p");
+      empty.textContent = "No players online.";
+      playerListContainer.appendChild(empty);
+    }
+
+    playersText.insertAdjacentElement("afterend", playerListContainer);
+  } catch (err) {
     statusText.textContent = "Server Offline";
     statusText.className = "status-offline";
     playersText.textContent = "";
     offlineDisclaimer.classList.remove("hidden");
-    const playerList = document.getElementById("player-list");
-    if (playerList) playerList.remove();
-    return;
-  }
 
-  const online = responseData.online;
-  updateDebugInfo(`Server online status: ${online}`);
+    const oldList = document.getElementById("player-list");
+    if (oldList) oldList.remove();
 
-  if (!online) {
-    statusText.textContent = "Server Offline";
-    statusText.className = "status-offline";
-    playersText.textContent = "";
-    offlineDisclaimer.classList.remove("hidden");
-    const playerList = document.getElementById("player-list");
-    if (playerList) playerList.remove();
-    return;
-  }
-
-  statusText.textContent = "Online";
-  statusText.className = "status-online";
-  playersText.textContent = `${responseData.players.online}/${responseData.players.max} players`;
-
-  // Remove previous player list if exists
-  const existingList = document.getElementById("player-list");
-  if (existingList) existingList.remove();
-
-  if (Array.isArray(responseData.players?.list) && responseData.players.list.length > 0) {
-    const listContainer = document.createElement("div");
-    listContainer.id = "player-list";
-    listContainer.style.marginTop = "1rem";
-
-    responseData.players.list.forEach(player => {
-      const playerEl = document.createElement("div");
-      playerEl.className = "player";
-
-      const avatar = document.createElement("img");
-      avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
-      avatar.alt = player.name;
-
-      const name = document.createElement("span");
-      name.textContent = player.name;
-
-      playerEl.appendChild(avatar);
-      playerEl.appendChild(name);
-      listContainer.appendChild(playerEl);
-    });
-
-    playersText.parentNode.insertBefore(listContainer, playersText.nextSibling);
-  }
-
-  offlineDisclaimer.classList.add("hidden");
-
-  if (successfulUrl) {
-    localStorage.setItem("successful_api_url", successfulUrl);
-    updateDebugInfo(`Saved successful URL format for future use: ${successfulUrl}`);
+    updateDebugInfo("Error: " + err.message);
   }
 }
 

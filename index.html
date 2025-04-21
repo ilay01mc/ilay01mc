@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ilaymc status</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>ilaymc status</h1>
+  <div class="tabs">
+    <div class="tab" id="status-tab">Status</div>
+    <div class="tab" id="ip-tab">View IP</div>
+  </div>
+
+  <div class="container" id="status-container">
+    <p id="status-text">Checking status...</p>
+    <p id="players-text"></p>
+    <div id="offline-disclaimer" class="hidden">
+      <p style="font-size: 0.8rem; color: white;">The server might still be online. Sometimes it shows offline due to a bug.</p>
+    </div>
+    <div id="debug-info" class="hidden"></div>
+  </div>
+
+  <div class="container hidden" id="ip-container">
+    <input type="password" id="password-input" placeholder="Enter password" />
+    <div id="ip-info" class="ip-info hidden">
+      <p><strong>IP Address:</strong> ilaymc.ddns.net</p>
+      <p><strong>Port:</strong> 19132</p>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

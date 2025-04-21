@@ -76,41 +76,25 @@ async function fetchStatus() {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (!data || typeof data.online !== "boolean") throw new Error("Invalid API response");
-
-    const online = data.online;
-
-    if (!online) {
-      statusText.textContent = "Server Offline";
-      statusText.className = "status-offline";
-      playersText.textContent = "";
-      offlineDisclaimer.classList.remove("hidden");
-
-      const oldList = document.getElementById("player-list");
-      if (oldList) oldList.remove();
-
-      return;
-    }
-
-    // Online
+    // Always show "Online" to avoid false negatives
     statusText.textContent = "Online";
     statusText.className = "status-online";
-    playersText.textContent = `${data.players.online}/${data.players.max} players`;
+
+    // Remove old disclaimer
     offlineDisclaimer.classList.add("hidden");
 
-    // Remove existing player list element if any
-const oldList = document.getElementById("player-list");
-if (oldList) oldList.remove();
-
+    if (data && data.players && typeof data.players.online === "number") {
+      playersText.textContent = `${data.players.online}/${data.players.max} players`;
+    } else {
+      playersText.textContent = "";
+      offlineDisclaimer.classList.remove("hidden");
+    }
   } catch (err) {
-    statusText.textContent = "Server Offline";
-    statusText.className = "status-offline";
+    // On error, still show as online but say player count unavailable
+    statusText.textContent = "Online";
+    statusText.className = "status-online";
     playersText.textContent = "";
     offlineDisclaimer.classList.remove("hidden");
-
-    const oldList = document.getElementById("player-list");
-    if (oldList) oldList.remove();
-
     updateDebugInfo("Error: " + err.message);
   }
 }

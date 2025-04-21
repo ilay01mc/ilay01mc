@@ -19,7 +19,7 @@ const SERVER_IP = "ilaymc.ddns.net";
 const SERVER_PORT = "19132";
 
 // Debug mode (set to false to hide debug info)
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 const showTab = (tab) => {
   if (tab === "status") {

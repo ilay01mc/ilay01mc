@@ -1,3 +1,4 @@
+// main.js
 const statusTab = document.getElementById("status-tab");
 const ipTab = document.getElementById("ip-tab");
 const statusContainer = document.getElementById("status-container");
@@ -14,11 +15,9 @@ const PASSWORD = "123";
 const PASSWORD_KEY = "ip_access_pass";
 const PASSWORD_VERSION = "v1";
 
-// Server configuration
 const SERVER_IP = "ilaymc.ddns.net";
 const SERVER_PORT = "19132";
 
-// Debug mode (set to false to hide debug info)
 const DEBUG_MODE = false;
 
 const showTab = (tab) => {
@@ -132,34 +131,33 @@ async function fetchStatus() {
   statusText.className = "status-online";
   playersText.textContent = `${responseData.players.online}/${responseData.players.max} players`;
 
-  let existingList = document.getElementById("player-list");
-if (existingList) existingList.remove();
+  // Remove previous player list if exists
+  const existingList = document.getElementById("player-list");
+  if (existingList) existingList.remove();
 
-// Create new player list if players exist
-if (Array.isArray(responseData.players?.list) && responseData.players.list.length > 0) {
-  const listContainer = document.createElement("div");
-  listContainer.id = "player-list";
-  listContainer.style.marginTop = "1rem";
+  if (Array.isArray(responseData.players?.list) && responseData.players.list.length > 0) {
+    const listContainer = document.createElement("div");
+    listContainer.id = "player-list";
+    listContainer.style.marginTop = "1rem";
 
-  responseData.players.list.forEach(player => {
-    const playerEl = document.createElement("div");
-    playerEl.className = "player";
+    responseData.players.list.forEach(player => {
+      const playerEl = document.createElement("div");
+      playerEl.className = "player";
 
-    const avatar = document.createElement("img");
-    avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
-    avatar.alt = player.name;
+      const avatar = document.createElement("img");
+      avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
+      avatar.alt = player.name;
 
-    const name = document.createElement("span");
-    name.textContent = player.name;
+      const name = document.createElement("span");
+      name.textContent = player.name;
 
-    playerEl.appendChild(avatar);
-    playerEl.appendChild(name);
-    listContainer.appendChild(playerEl);
-  });
+      playerEl.appendChild(avatar);
+      playerEl.appendChild(name);
+      listContainer.appendChild(playerEl);
+    });
 
-  // Insert list after playersText
-  playersText.parentNode.insertBefore(listContainer, playersText.nextSibling);
-}
+    playersText.parentNode.insertBefore(listContainer, playersText.nextSibling);
+  }
 
   offlineDisclaimer.classList.add("hidden");
 

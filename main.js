@@ -132,32 +132,34 @@ async function fetchStatus() {
   statusText.className = "status-online";
   playersText.textContent = `${responseData.players.online}/${responseData.players.max} players`;
 
-  const existingList = document.getElementById("player-list");
-  if (existingList) existingList.remove();
+  let existingList = document.getElementById("player-list");
+if (existingList) existingList.remove();
 
-  if (responseData.players.list && responseData.players.list.length > 0) {
-    const list = document.createElement("div");
-    list.id = "player-list";
-    list.style.marginTop = "1rem";
+// Create new player list if players exist
+if (Array.isArray(responseData.players?.list) && responseData.players.list.length > 0) {
+  const listContainer = document.createElement("div");
+  listContainer.id = "player-list";
+  listContainer.style.marginTop = "1rem";
 
-    responseData.players.list.forEach(player => {
-      const playerDiv = document.createElement("div");
-      playerDiv.className = "player";
+  responseData.players.list.forEach(player => {
+    const playerEl = document.createElement("div");
+    playerEl.className = "player";
 
-      const avatar = document.createElement("img");
-      avatar.src = `https://crafthead.net/avatar/${player.name}/24`;
-      avatar.alt = player.name;
+    const avatar = document.createElement("img");
+    avatar.src = `https://crafthead.net/avatar/${player.name}/32`;
+    avatar.alt = player.name;
 
-      const name = document.createElement("span");
-      name.textContent = player.name;
+    const name = document.createElement("span");
+    name.textContent = player.name;
 
-      playerDiv.appendChild(avatar);
-      playerDiv.appendChild(name);
-      list.appendChild(playerDiv);
-    });
+    playerEl.appendChild(avatar);
+    playerEl.appendChild(name);
+    listContainer.appendChild(playerEl);
+  });
 
-    playersText.insertAdjacentElement("afterend", list);
-  }
+  // Insert list after playersText
+  playersText.parentNode.insertBefore(listContainer, playersText.nextSibling);
+}
 
   offlineDisclaimer.classList.add("hidden");
 

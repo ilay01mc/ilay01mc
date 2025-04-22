@@ -65,22 +65,22 @@
     }
 
     .glowing-text {
-  text-shadow:
-    0 0 4px #fff,
-    0 0 10px #3b82f6,
-    0 0 20px #3b82f6,
-    0 0 40px #3b82f6;
-  animation: glowPulse 3s ease-in-out infinite alternate;
-}
+      text-shadow:
+        0 0 4px #fff,
+        0 0 10px #3b82f6,
+        0 0 20px #3b82f6,
+        0 0 40px #3b82f6;
+      animation: glowPulse 3s ease-in-out infinite alternate;
+    }
 
-@keyframes glowPulse {
-  0% {
-    text-shadow: 0 0 2px #fff, 0 0 5px #3b82f6, 0 0 10px #3b82f6;
-  }
-  100% {
-    text-shadow: 0 0 6px #fff, 0 0 12px #3b82f6, 0 0 30px #3b82f6;
-  }
-}
+    @keyframes glowPulse {
+      0% {
+        text-shadow: 0 0 2px #fff, 0 0 5px #3b82f6, 0 0 10px #3b82f6;
+      }
+      100% {
+        text-shadow: 0 0 6px #fff, 0 0 12px #3b82f6, 0 0 30px #3b82f6;
+      }
+    }
   </style>
 </head>
 
@@ -127,6 +127,14 @@
     <section class="max-w-2xl mx-auto my-16 text-center animate-fade-in">
       <h2 class="text-2xl mb-4 text-white">About the Server</h2>
       <p class="text-sm">A vanilla Bedrock edition survival server</p>
+    </section>
+
+    <!-- Online Players -->
+    <section class="max-w-2xl mx-auto text-center animate-fade-in mb-16">
+      <h2 class="text-2xl mb-4 text-white">Online Players</h2>
+      <ul id="player-list" class="text-sm text-sky-300 space-y-1">
+        <li>Loading...</li>
+      </ul>
     </section>
 
     <!-- Footer -->
@@ -242,6 +250,37 @@
     }
     fetchServerStatus();
     setInterval(fetchServerStatus, 30000);
+  </script>
+
+  <!-- Player List -->
+  <script>
+    async function fetchPlayers() {
+      try {
+        const res = await fetch('https://ilaymcapi.mooo.com/api/players');
+        const data = await res.json();
+        const list = document.getElementById('player-list');
+        list.innerHTML = '';
+
+        console.log("👥 Players Online:", data.players);
+
+        if (!data.players || data.players.length === 0) {
+          list.innerHTML = '<li>No players online</li>';
+          return;
+        }
+
+        data.players.forEach(player => {
+          const li = document.createElement('li');
+          li.textContent = player;
+          list.appendChild(li);
+        });
+      } catch (e) {
+        console.error("❌ Error loading player list:", e);
+        document.getElementById('player-list').innerHTML = '<li>Error loading players</li>';
+      }
+    }
+
+    fetchPlayers();
+    setInterval(fetchPlayers, 10000);
   </script>
 </body>
 </html>
